@@ -1,0 +1,119 @@
+-- USERS TABLE
+CREATE TABLE IF NOT EXISTS users (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  email VARCHAR(100) UNIQUE NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  role ENUM('adopter', 'donor', 'daycare_owner', 'admin') NOT NULL,
+  status ENUM('active', 'inactive') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- PETS TABLE
+CREATE TABLE IF NOT EXISTS pets (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  age INT,
+  breed VARCHAR(100),
+  category_id INT,
+  owner_id INT,
+  status ENUM('available', 'adopted', 'inactive') DEFAULT 'available',
+  description TEXT,
+  image_url VARCHAR(255),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (category_id) REFERENCES categories(id),
+  FOREIGN KEY (owner_id) REFERENCES users(id)
+);
+
+-- PET MEDICAL RECORDS
+CREATE TABLE IF NOT EXISTS pet_medical_records (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  pet_id INT NOT NULL,
+  record_date DATE,
+  description TEXT,
+  veterinarian_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (pet_id) REFERENCES pets(id),
+  FOREIGN KEY (veterinarian_id) REFERENCES veterinarians(id)
+);
+
+-- ADOPTION REQUESTS
+CREATE TABLE IF NOT EXISTS adoption_requests (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  pet_id INT NOT NULL,
+  adopter_id INT NOT NULL,
+  status ENUM('pending', 'approved', 'rejected', 'cancelled') DEFAULT 'pending',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (pet_id) REFERENCES pets(id),
+  FOREIGN KEY (adopter_id) REFERENCES users(id)
+);
+
+-- ADOPTIONS
+CREATE TABLE IF NOT EXISTS adoptions (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  pet_id INT NOT NULL,
+  adopter_id INT NOT NULL,
+  adoption_date DATE,
+  status ENUM('active', 'completed', 'cancelled') DEFAULT 'active',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (pet_id) REFERENCES pets(id),
+  FOREIGN KEY (adopter_id) REFERENCES users(id)
+);
+
+-- CARE SCHEDULES
+CREATE TABLE IF NOT EXISTS care_schedules (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  pet_id INT NOT NULL,
+  schedule_date DATE,
+  activity VARCHAR(100),
+  notes TEXT,
+  status ENUM('scheduled', 'completed', 'cancelled') DEFAULT 'scheduled',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (pet_id) REFERENCES pets(id)
+);
+
+-- FEEDBACK
+CREATE TABLE IF NOT EXISTS feedback (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  pet_id INT,
+  rating INT CHECK (rating >= 1 AND rating <= 5),
+  comment TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (pet_id) REFERENCES pets(id)
+);
+
+-- CATEGORIES
+CREATE TABLE IF NOT EXISTS categories (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- VETERINARIANS
+CREATE TABLE IF NOT EXISTS veterinarians (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  contact VARCHAR(100),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- ACTIVITY LOGS
+CREATE TABLE IF NOT EXISTS activity_logs (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT,
+  action VARCHAR(255),
+  details TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
