@@ -2,10 +2,11 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const dotenv = require('dotenv');
-const db = require('./config/db');
 
-// Load env vars
-dotenv.config({ path: '../.env' });
+// Load env vars from the backend/.env file
+dotenv.config();
+
+const db = require('./config/db');
 
 const app = express();
 app.use(cors());
@@ -14,19 +15,19 @@ app.use(bodyParser.json());
 // Import routes
 const userRoutes = require('./routes/users');
 const paymentRoutes = require('./routes/payments');
+const petRoutes = require('./routes/pets');
+const adoptionRoutes = require('./routes/adoptions');
+const daycareRoutes = require('./routes/daycare');
+const medicalRoutes = require('./routes/medical');
+const feedbackRoutes = require('./routes/feedback');
 
 // Use routes
 app.use('/api/users', userRoutes);
 app.use('/api/payments', paymentRoutes);
-const petRoutes = require('./routes/pets');
 app.use('/api/pets', petRoutes);
-const adoptionRoutes = require('./routes/adoptions');
 app.use('/api/adoptions', adoptionRoutes);
-const daycareRoutes = require('./routes/daycare');
 app.use('/api/daycare', daycareRoutes);
-const medicalRoutes = require('./routes/medical');
 app.use('/api/medical', medicalRoutes);
-const feedbackRoutes = require('./routes/feedback');
 app.use('/api/feedback', feedbackRoutes);
 
 app.get('/', (req, res) => {
